@@ -1,3 +1,4 @@
+import 'package:around_you/pages/login_register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:around_you/widget_tree.dart';
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.orange
       ),
-      home: const WidgetTree(),
+      home: const LoginPage(),
     );
   }
 }
