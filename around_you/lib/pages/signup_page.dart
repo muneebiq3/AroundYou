@@ -1,17 +1,18 @@
+import 'package:around_you/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:around_you/auth.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class SignupPage extends StatefulWidget {
+  const SignupPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignupPageState extends State<SignupPage> {
   String? errorMessage = '';
-  bool isLogin = true;
+  bool isSignup = true;
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
@@ -19,19 +20,6 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> signInWithEmailAndPassword() async {
     try {
       await Auth().signInWithEmailAndPassword(
-        email: _controllerEmail.text,
-        password: _controllerPassword.text,
-      );
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        errorMessage = e.message;
-      });
-    }
-  }
-
-  Future<void> createUserWithEmailAndPassword() async {
-    try {
-      await Auth().createUserWithEmailAndPassword(
         email: _controllerEmail.text,
         password: _controllerPassword.text,
       );
@@ -53,9 +41,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _entryField(String title, TextEditingController controller, String placeholder) {
+  Widget _entryField(String title, TextEditingController controller, String placeholder, bool hide) {
     return TextField(
       controller: controller,
+      obscureText: hide,
       decoration: InputDecoration(
         labelText: title,
         labelStyle: const TextStyle(color: Colors.white),
@@ -81,29 +70,32 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _submitButton() {
     return ElevatedButton(
-      onPressed: isLogin ? signInWithEmailAndPassword : createUserWithEmailAndPassword,
+      onPressed: signInWithEmailAndPassword,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF90B3E9), // Theme color for button text
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
         ),
       ),
-      child: Text(isLogin ? 'Login' : 'Register'),
+      child: const Text('Register'),
     );
   }
 
-  Widget _loginOrRegisterButton() {
+  Widget _signUpButton() {
     return TextButton(
       onPressed: () {
-        setState(() {
-          isLogin = !isLogin;
-        });
+        Navigator.push(
+          context, 
+          MaterialPageRoute(
+            builder: (context) => const LoginPage()
+          )
+        );
       },
-      child: Text(
-        isLogin ? 'Register Instead' : 'Login Instead',
-        style: const TextStyle(color: Colors.white),
+      child: const Text(
+        'Already a User? Sign In Now!',
+        style: TextStyle(color: Colors.white),
       ),
     );
   }
@@ -134,15 +126,17 @@ class _LoginPageState extends State<LoginPage> {
               children: <Widget>[
                 _title(),
                 const SizedBox(height: 40),
-                _entryField('Email', _controllerEmail, 'Enter User ID or Email'),
-                const SizedBox(height: 20),
-                _entryField('Password', _controllerPassword, 'Enter Password'),
+                _entryField('Name', _controllerEmail, 'Enter Name', false),
+                const SizedBox(height: 30),
+                _entryField('Email', _controllerEmail, 'Enter User ID or Email', false),
+                const SizedBox(height: 30),
+                _entryField('Password', _controllerPassword, 'Enter Password', true),
                 const SizedBox(height: 10),
                 _errorMessage(),
                 const SizedBox(height: 20),
                 _submitButton(),
                 const SizedBox(height: 20),
-                _loginOrRegisterButton(),
+                _signUpButton(),
               ],
             ),
           ),
