@@ -1,3 +1,4 @@
+import 'package:around_you/pages/home_page.dart';
 import 'package:around_you/pages/signup_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -70,7 +71,15 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _loginButton() {
     return ElevatedButton(
-      onPressed: signInWithEmailAndPassword,
+      onPressed: () {
+        signInWithEmailAndPassword;
+        Navigator.push(
+          context, 
+          MaterialPageRoute(
+            builder: (context) => HomePage()
+          )
+        );
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF90B3E9), // Theme color for button text
@@ -126,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
               children: <Widget>[
                 _title(),
                 const SizedBox(height: 40),
-                _entryField('Email', _controllerEmail, 'Enter User ID or Email', false),
+                _entryField('Username or Email', _controllerEmail, 'Enter Username or Email', false),
                 const SizedBox(height: 30),
                 _entryField('Password', _controllerPassword, 'Enter Password', true),
                 const SizedBox(height: 10),
