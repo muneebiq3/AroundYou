@@ -68,7 +68,7 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  Widget _submitButton() {
+  Widget _signUpButton() {
     return ElevatedButton(
       onPressed: signInWithEmailAndPassword,
       style: ElevatedButton.styleFrom(
@@ -83,7 +83,7 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  Widget _signUpButton() {
+  Widget _logInButton() {
     return TextButton(
       onPressed: () {
         Navigator.push(
@@ -134,9 +134,9 @@ class _SignupPageState extends State<SignupPage> {
                 const SizedBox(height: 10),
                 _errorMessage(),
                 const SizedBox(height: 20),
-                _submitButton(),
-                const SizedBox(height: 20),
                 _signUpButton(),
+                const SizedBox(height: 20),
+                _logInButton(),
               ],
             ),
           ),
