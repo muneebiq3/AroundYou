@@ -1,17 +1,17 @@
-import 'package:around_you/pages/home_page.dart';
-import 'package:around_you/pages/signup_page.dart';
+import 'package:around_you/screens/home_screen.dart';
+import 'package:around_you/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:around_you/auth.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginScreenState extends State<LoginScreen> {
   String? errorMessage = '';
   bool isLogin = true;
 
@@ -76,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.push(
           context, 
           MaterialPageRoute(
-            builder: (context) => HomePage()
+            builder: (context) => const HomeScreen()
           )
         );
       },
@@ -98,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.push(
           context, 
           MaterialPageRoute(
-            builder: (context) => const SignupPage()
+            builder: (context) => const SignupScreen()
           )
         );
       },

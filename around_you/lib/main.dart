@@ -1,7 +1,6 @@
-import 'package:around_you/pages/login_page.dart';
+import 'package:around_you/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:around_you/widget_tree.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.orange
       ),
-      home: const LoginPage(),
+      home: const LoginScreen(),
     );
   }
 }
