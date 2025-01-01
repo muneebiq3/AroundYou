@@ -12,6 +12,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
+  String? errorMessage = '';
   String? userName = "Programmer";
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -37,8 +38,10 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         }
       }
-    } catch (e) {
-      print("Error fetching user name: $e");
+    } on FirebaseAuthException catch (e) {
+        setState(() {
+          errorMessage = e.message;
+      });
     }
   }
 
@@ -237,8 +240,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       const Spacer(),
+                      // GestureDetector(
+                      //   onTap: () {
+                      //     FirebaseAuth.instance.signOut();
+                      //     Navigator.pushNamed(context, "/login_screen");
+                      //   },
+                      // )
                       IconButton(
-                        onPressed: () {}, 
+                        onPressed: () {
+                          FirebaseAuth.instance.signOut();
+                          Navigator.pushNamed(context, "/login_screen");
+                        }, 
                         icon: const Icon(
                           Icons.notifications
                         ),

@@ -1,33 +1,59 @@
 import 'package:around_you/screens/login_screen.dart';
+import 'package:around_you/user_auth/firebase_auth_implementation/firebase_auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:around_you/auth.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
+  
 }
 
 class _SignupScreenState extends State<SignupScreen> {
   String? errorMessage = '';
-  bool isSignup = true;
 
+  final FirebaseAuthService _auth = FirebaseAuthService();
+
+  final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
 
-  Future<void> signInWithEmailAndPassword() async {
-    try {
-      await Auth().signInWithEmailAndPassword(
-        email: _controllerEmail.text,
-        password: _controllerPassword.text,
-      );
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        errorMessage = e.message;
-      });
-    }
+
+  void _signUp() async {
+
+      String email = _controllerEmail.text;
+      String password = _controllerPassword.text;
+
+      User? user = await _auth.signUpWithEmailAndPassword(email, password);
+
+      if(user != null) {
+        try {
+          // ignore: use_build_context_synchronously
+          Navigator.push(
+            // ignore: use_build_context_synchronously
+            context, 
+            MaterialPageRoute(
+              builder: (context) => const LoginScreen()
+            )
+          );
+        }
+
+        on FirebaseAuthException catch (e) {
+          setState(() {
+            errorMessage = e.message;
+          });
+        }
+      }
+  }
+
+  @override
+  void dispose() {
+    _controllerName.dispose();
+    _controllerEmail.dispose();
+    _controllerPassword.dispose();
+    super.dispose();
   }
 
   Widget _title() {
@@ -70,7 +96,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Widget _signUpButton() {
     return ElevatedButton(
-      onPressed: signInWithEmailAndPassword,
+      onPressed: _signUp,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF90B3E9), // Theme color for button text
@@ -126,7 +152,7 @@ class _SignupScreenState extends State<SignupScreen> {
               children: <Widget>[
                 _title(),
                 const SizedBox(height: 40),
-                _entryField('Name', _controllerEmail, 'Enter Name', false),
+                _entryField('Name', _controllerName, 'Enter Name', false),
                 const SizedBox(height: 30),
                 _entryField('Email', _controllerEmail, 'Enter User ID or Email', false),
                 const SizedBox(height: 30),
@@ -143,5 +169,6 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       ),
     );
+
   }
 }

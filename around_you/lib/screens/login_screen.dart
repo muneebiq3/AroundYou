@@ -1,8 +1,7 @@
-import 'package:around_you/screens/home_screen.dart';
 import 'package:around_you/screens/signup_screen.dart';
+import 'package:around_you/user_auth/firebase_auth_implementation/firebase_auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:around_you/auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,22 +12,38 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   String? errorMessage = '';
-  bool isLogin = true;
+
+  final FirebaseAuthService _auth = FirebaseAuthService();
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
 
-  Future<void> signInWithEmailAndPassword() async {
-    try {
-      await Auth().signInWithEmailAndPassword(
-        email: _controllerEmail.text,
-        password: _controllerPassword.text,
-      );
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        errorMessage = e.message;
-      });
-    }
+  @override
+  void dispose() {
+    _controllerEmail.dispose();
+    _controllerPassword.dispose();
+    super.dispose();
+  }
+
+  void _signIn() async {
+
+      String email = _controllerEmail.text;
+      String password = _controllerPassword.text;
+
+      User? user = await _auth.signInWithEmailAndPassword(email, password);
+
+      if(user != null) {
+        try {
+          // ignore: use_build_context_synchronously
+          Navigator.pushNamed(context, "/home_screen");
+        }
+
+        on FirebaseAuthException catch (e) {
+          setState(() {
+            errorMessage = e.message;
+          });
+        }
+      }
   }
 
   Widget _title() {
@@ -72,13 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _loginButton() {
     return ElevatedButton(
       onPressed: () {
-        signInWithEmailAndPassword;
-        Navigator.push(
-          context, 
-          MaterialPageRoute(
-            builder: (context) => const HomeScreen()
-          )
-        );
+        _signIn();
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
