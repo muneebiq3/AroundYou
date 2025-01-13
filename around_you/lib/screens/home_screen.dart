@@ -13,7 +13,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
 
   String? errorMessage = '';
-  String? userName = "Programmer";
+  String? userName = "User";
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
@@ -22,28 +22,36 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchUserName();
   }
 
-    Future<void> fetchUserName() async {
+  void fetchUserName() async {
     try {
-      User? user = _auth.currentUser;
-      if (user != null) {
-        // Example: Assuming user's name is stored in Firestore
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
+      
+      User? user = FirebaseAuth.instance.currentUser; // Get logged-in user
+      if (user == null) {
+        return;
+      }
 
-        if (userDoc.exists) {
+      QuerySnapshot usersCollection = await FirebaseFirestore.instance.collection('Users').get();
+
+      for (var doc in usersCollection.docs) {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(doc.id)
+          .get();
+            
+        // Check for the matching user uid in the sub-collection
+        if (userDoc.exists && userDoc['id'] == user.uid) {
           setState(() {
-            userName = userDoc['name'] ?? "Programmer"; // Fallback if name is null
+            userName = userDoc['Name']; // Update the userName variable
           });
+          break; // Exit the loop once the user is found
         }
       }
-    } on FirebaseAuthException catch (e) {
-        setState(() {
-          errorMessage = e.message;
-      });
+    } catch (e) {
+      // ignore: avoid_print
+      print('Error fetching user name: $e');
     }
   }
+
 
   Widget _recommendedJobs(
     BuildContext context, {
@@ -248,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       // )
                       IconButton(
                         onPressed: () {
-                          FirebaseAuth.instance.signOut();
+                          _auth.signOut();
                           Navigator.pushNamed(context, "/login_screen");
                         }, 
                         icon: const Icon(

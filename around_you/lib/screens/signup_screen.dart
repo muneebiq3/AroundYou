@@ -1,6 +1,4 @@
 import 'package:around_you/screens/login_screen.dart';
-import 'package:around_you/user_auth/firebase_auth_implementation/firebase_auth_services.dart';
-import 'package:around_you/user_auth/firebase_auth_implementation/uid_generator.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -25,6 +23,33 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _controllerPassword = TextEditingController();
   final TextEditingController _controllerConfirmPassword = TextEditingController();
 
+  String capitalizeName(String name) {
+    if (name.isEmpty) return '';
+    
+    List<String> words = name.split(' '); // Split by space to handle first and last name
+    for (int i = 0; i < words.length; i++) {
+      if (words[i].isNotEmpty) {
+        words[i] = words[i][0].toUpperCase() + words[i].substring(1).toLowerCase(); // Capitalize first letter, lowercase rest
+      }
+    }
+    return words.join(' '); // Join the words back together
+  }
+
+  Future<int> _getNextUserId() async {
+    DocumentReference counterDoc = FirebaseFirestore.instance.collection('MetaData').doc('UserCounter');
+
+    return FirebaseFirestore.instance.runTransaction((transaction) async {
+      DocumentSnapshot snapshot = await transaction.get(counterDoc);
+
+      int currentCount = snapshot.exists ? (snapshot.get('counter') as int) : 0;
+      int nextCount = currentCount + 1;
+
+      // Update the counter for the next user
+      transaction.set(counterDoc, {'counter': nextCount}, SetOptions(merge: true));
+      return nextCount;
+    });
+  }
+
   void _signUp() async {
 
     String name = _controllerName.text;
@@ -48,8 +73,11 @@ class _SignupScreenState extends State<SignupScreen> {
 
       User? user = userCredential.user;
       if (user != null) {
+        
+        name = capitalizeName(name);
+
         // Generate a new userId
-        int userId = UserIdGenerator().nextId;
+        int userId = await _getNextUserId();
 
         // Save user details to Firestore in nested collection
         await FirebaseFirestore.instance
@@ -61,7 +89,7 @@ class _SignupScreenState extends State<SignupScreen> {
             'Name': name,
             'CreatedAt': DateTime.now(),
             'User Id' : userId.toString(),
-          });
+        });
 
         // Navigate to login screen
         if (context.mounted) {
@@ -76,8 +104,8 @@ class _SignupScreenState extends State<SignupScreen> {
         errorMessage = e.message;
       });
     } catch (e) {
-      setState(() {
-        errorMessage = 'An unexpected error occurred. Please try again.';
+        setState(() {
+          errorMessage = 'An unexpected error occurred. Please try again.';
       });
     }
   }
@@ -219,7 +247,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 40),
                 _entryField('Name', _controllerName, 'Enter Name'),
                 const SizedBox(height: 30),
-                _entryField('Email', _controllerEmail, 'Enter User ID or Email'),
+                _entryField('Email', _controllerEmail, 'Enter your Email'),
                 const SizedBox(height: 30),
                 _passwordField('Password', _controllerPassword, 'Enter Password'),
                 const SizedBox(height: 30),
