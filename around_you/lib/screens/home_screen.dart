@@ -252,7 +252,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.pushNamed(context, "/login_screen");
                         }, 
                         icon: const Icon(
-                          Icons.notifications
+                          Icons.logout,
                         ),
                         iconSize: 30,
                         color: const Color(0xFFB3CFF1),
