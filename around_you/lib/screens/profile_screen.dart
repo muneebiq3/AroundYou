@@ -21,8 +21,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerContact = TextEditingController();
   final TextEditingController _controllerDesignation = TextEditingController();
-  final TextEditingController _controllerPassword = TextEditingController();
-  final TextEditingController _controllerConfirmPassword = TextEditingController();
+  final TextEditingController _controllerCurrentPassword = TextEditingController();
+  final TextEditingController _controllerNewPassword = TextEditingController();
+  final TextEditingController _controllerConfirmNewPassword = TextEditingController();
 
   @override
   void dispose() {
@@ -30,8 +31,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _controllerEmail.dispose();
     _controllerContact.dispose();
     _controllerDesignation.dispose();
-    _controllerPassword.dispose();
-    _controllerConfirmPassword.dispose();
+    _controllerCurrentPassword.dispose();
+    _controllerNewPassword.dispose();
+    _controllerConfirmNewPassword.dispose();
     super.dispose();
   }
 
@@ -52,12 +54,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String email = _controllerEmail.text.trim();
     String contact = _controllerContact.text.trim();
     String designation = _controllerDesignation.text.trim();
-    String password = _controllerPassword.text;
-    String confirmPassword = _controllerConfirmPassword.text;
+    String currentPassword = _controllerCurrentPassword.text;
+    String newPassword = _controllerNewPassword.text;
+    String confirmNewPassword = _controllerConfirmNewPassword.text;
 
-    if (password.isNotEmpty && password != confirmPassword) {
+    if (currentPassword.isNotEmpty && newPassword != confirmNewPassword) {
       setState(() {
-        errorMessage = 'Passwords do not match!';
+        errorMessage = 'Old Password';
       });
       return;
     }
@@ -97,11 +100,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               .doc(documentId)
               .update(updateData);
 
+          // Reauthenticate user before updating sensitive information
+          AuthCredential credential = EmailAuthProvider.credential(
+            email: currentUser.email ?? '',
+            password: _controllerCurrentPassword.text, // Prompt user for current password
+          );
+
+          await currentUser.reauthenticateWithCredential(credential);
+
           if (email.isNotEmpty && email != currentUser.email) {
             await currentUser.verifyBeforeUpdateEmail(email);
           }
-          if (password.isNotEmpty) {
-            await currentUser.updatePassword(password);
+          if (newPassword.isNotEmpty) {
+            await currentUser.updatePassword(newPassword);
           }
 
           setState(() {
@@ -305,9 +316,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 20),
                     _entryField('Designation', _controllerDesignation, 'Please enter your Designation'),
                     const SizedBox(height: 20),
-                    _passwordField('Password', _controllerPassword, 'Enter Password'),
+                    _passwordField('Old Password', _controllerCurrentPassword, 'Enter current Password'),
                     const SizedBox(height: 20),
-                    _passwordField('Confirm Password', _controllerConfirmPassword, 'Please confirm Password'),
+                    _passwordField('New Password', _controllerNewPassword, 'Enter new Password'),
+                    const SizedBox(height: 20),
+                    _passwordField('Confirm Password', _controllerConfirmNewPassword, 'Please confirm new Password'),
                     const SizedBox(height: 4),
                     _errorMessage(),
                     const SizedBox(height: 10),
