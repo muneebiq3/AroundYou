@@ -13,12 +13,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   bool hidePassword = true;
   String? errorMessage = '';
-  String? successMessage = '';
+  String successMessage = '';
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final TextEditingController _controllerName = TextEditingController();
-  final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerContact = TextEditingController();
   final TextEditingController _controllerDesignation = TextEditingController();
   final TextEditingController _controllerCurrentPassword = TextEditingController();
@@ -28,7 +27,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     _controllerName.dispose();
-    _controllerEmail.dispose();
     _controllerContact.dispose();
     _controllerDesignation.dispose();
     _controllerCurrentPassword.dispose();
@@ -51,7 +49,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _updateProfile() async {
     String name = _controllerName.text.trim();
-    String email = _controllerEmail.text.trim();
     String contact = _controllerContact.text.trim();
     String designation = _controllerDesignation.text.trim();
     String currentPassword = _controllerCurrentPassword.text;
@@ -60,7 +57,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (currentPassword.isNotEmpty && newPassword != confirmNewPassword) {
       setState(() {
-        errorMessage = 'Old Password';
+        errorMessage = 'Passwords do not match.';
       });
       return;
     }
@@ -100,18 +97,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               .doc(documentId)
               .update(updateData);
 
-          // Reauthenticate user before updating sensitive information
-          AuthCredential credential = EmailAuthProvider.credential(
-            email: currentUser.email ?? '',
-            password: _controllerCurrentPassword.text, // Prompt user for current password
-          );
-
-          await currentUser.reauthenticateWithCredential(credential);
-
-          if (email.isNotEmpty && email != currentUser.email) {
-            await currentUser.verifyBeforeUpdateEmail(email);
-          }
+          // Only reauthenticate if updating password
           if (newPassword.isNotEmpty) {
+            // Reauthenticate user before updating the password
+            AuthCredential credential = EmailAuthProvider.credential(
+              email: currentUser.email ?? '',
+              password: currentPassword,
+            );
+
+            await currentUser.reauthenticateWithCredential(credential);
             await currentUser.updatePassword(newPassword);
           }
 
@@ -142,6 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
     }
   }
+
 
   Widget _entryField(String title, TextEditingController controller, String placeholder) {
     return SizedBox(
@@ -232,6 +227,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _successMessage() {
+    return Text(
+    successMessage.isEmpty ? '' : successMessage,
+      style: const TextStyle(color: Colors.white, fontSize: 20),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -310,8 +312,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 20),
                     _entryField('Name', _controllerName, 'Enter Name'),
                     const SizedBox(height: 20),
-                    _entryField('Email', _controllerEmail, 'Enter your Email'),
-                    const SizedBox(height: 20),
                     _entryField('Contact#', _controllerContact, 'Enter your Contact'),
                     const SizedBox(height: 20),
                     _entryField('Designation', _controllerDesignation, 'Please enter your Designation'),
@@ -323,6 +323,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _passwordField('Confirm Password', _controllerConfirmNewPassword, 'Please confirm new Password'),
                     const SizedBox(height: 4),
                     _errorMessage(),
+                    const SizedBox(height: 10),
+                    _successMessage(),
                     const SizedBox(height: 10),
                     _updateButton(),
                   ],

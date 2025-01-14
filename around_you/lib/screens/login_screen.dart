@@ -14,6 +14,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool hidePassword = true;
 
   String? errorMessage = '';
+  String successMessage = '';
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -38,6 +39,12 @@ class _LoginScreenState extends State<LoginScreen> {
         email: email, 
         password: password,
       );
+
+      setState(() {
+        successMessage = 'Logged in successfully!';
+      });
+
+      await Future.delayed(const Duration(seconds: 2));
 
       if (userCredential.user != null) {
         // Navigate to home screen if sign-in is successful
@@ -130,6 +137,13 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Widget _successMessage() {
+    return Text(
+    successMessage.isEmpty ? '' : successMessage,
+      style: const TextStyle(color: Colors.white, fontSize: 20),
+    );
+  }
+
   Widget _loginButton() {
     return ElevatedButton(
       onPressed: () {
@@ -196,6 +210,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 10),
                 _errorMessage(),
                 const SizedBox(height: 20),
+                _successMessage(),
+                const SizedBox(height: 10),
                 _loginButton(),
                 const SizedBox(height: 20),
                 _signUpButton(),

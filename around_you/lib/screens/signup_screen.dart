@@ -15,6 +15,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   bool hidePassword = true;
   String? errorMessage = '';
+  String successMessage ='';
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -97,6 +98,12 @@ class _SignupScreenState extends State<SignupScreen> {
             'User Id' : userId.toString(),
         });
 
+        setState(() {
+            successMessage = 'Account created successfully!';
+        });
+
+        await Future.delayed(const Duration(seconds: 2));
+        
         // Navigate to login screen
         if (context.mounted) {
           Navigator.push(
@@ -201,6 +208,13 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  Widget _successMessage() {
+    return Text(
+    successMessage.isEmpty ? '' : successMessage,
+      style: const TextStyle(color: Colors.white, fontSize: 20),
+    );
+  }
+
   Widget _signUpButton() {
     return ElevatedButton(
       onPressed: _signUp,
@@ -272,6 +286,8 @@ class _SignupScreenState extends State<SignupScreen> {
                 _passwordField('Confirm Password', _controllerConfirmPassword, 'Please confirm Password'),
                 const SizedBox(height: 4),
                 _errorMessage(),
+                const SizedBox(height: 10),
+                _successMessage(),
                 const SizedBox(height: 10),
                 _signUpButton(),
                 const SizedBox(height: 10),
