@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:around_you/screens/job_details_screen.dart';
+import 'package:around_you/screens/profile_screen.dart';
 import 'package:around_you/theme/images.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,18 +15,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String? errorMessage = '';
   String? userName = "User";
+  String? userDesignation = "Unemployed";
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
   @override
   void initState() {
     super.initState();
-    fetchUserName();
+    fetchUserDetails();
   }
 
-  void fetchUserName() async {
+  void fetchUserDetails() async {
     try {
       
-      User? user = FirebaseAuth.instance.currentUser; // Get logged-in user
+      User? user = _auth.currentUser; // Get logged-in user
       if (user == null) {
         return;
       }
@@ -42,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (userDoc.exists && userDoc['id'] == user.uid) {
           setState(() {
             userName = userDoc['Name']; // Update the userName variable
+            userDesignation = userDoc['Designation'];
           });
           break; // Exit the loop once the user is found
         }
@@ -51,7 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
       print('Error fetching user name: $e');
     }
   }
-
 
   Widget _recommendedJobs(
     BuildContext context, {
@@ -199,19 +200,19 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Container(
-        height: double.infinity,
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF266DD1), // Darker shade
-              Color(0xFF90B3E9), // Primary theme color
-              Color(0xFFB3CFF1), // Lighter shade
-            ],
+          height: double.infinity,
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topRight,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFF266DD1), // Darker shade
+                Color(0xFF90B3E9), // Primary theme color
+                Color(0xFFB3CFF1), // Lighter shade
+              ],
+            ),
           ),
-        ),
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -221,25 +222,35 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 15),
                   Row(
                     children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundImage: AssetImage(Images.user),
+                      GestureDetector(
+                        child: CircleAvatar(
+                          radius: 30,
+                          backgroundImage: AssetImage(Images.user),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context, 
+                            MaterialPageRoute(
+                              builder: (context) => const ProfileScreen()
+                            )
+                          );
+                        },
                       ),
                       const SizedBox(width: 20,),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Dear $userName",
+                            "$userName",
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
                               color: Colors.white,
                             ),
                           ),
-                          const Text(
-                            "Flutter Developer",
-                            style: TextStyle(
+                          Text(
+                            "$userDesignation",
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: Color(0xFFB3CFF1)
@@ -247,24 +258,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           )
                         ],
                       ),
-                      const Spacer(),
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     FirebaseAuth.instance.signOut();
-                      //     Navigator.pushNamed(context, "/login_screen");
-                      //   },
-                      // )
-                      IconButton(
-                        onPressed: () {
-                          _auth.signOut();
-                          Navigator.pushNamed(context, "/login_screen");
-                        }, 
-                        icon: const Icon(
-                          Icons.logout,
-                        ),
-                        iconSize: 30,
-                        color: const Color(0xFFB3CFF1),
-                      )
                     ],
                   ),
                   const SizedBox(height: 20),

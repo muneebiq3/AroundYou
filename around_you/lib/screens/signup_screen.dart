@@ -20,6 +20,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerEmail = TextEditingController();
+  final TextEditingController _controllerContact = TextEditingController();
+  final TextEditingController _controllerDesignation = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
   final TextEditingController _controllerConfirmPassword = TextEditingController();
 
@@ -54,6 +56,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
     String name = _controllerName.text;
     String email = _controllerEmail.text;
+    String contact = _controllerContact.text;
+    String designation = _controllerDesignation.text;
     String password = _controllerPassword.text;
     String confirmPassword = _controllerConfirmPassword.text;
 
@@ -87,6 +91,8 @@ class _SignupScreenState extends State<SignupScreen> {
             'id': user.uid,
             'Email': email,
             'Name': name,
+            'Contact': contact,
+            'Designation': designation,
             'CreatedAt': DateTime.now(),
             'User Id' : userId.toString(),
         });
@@ -114,6 +120,8 @@ class _SignupScreenState extends State<SignupScreen> {
   void dispose() {
     _controllerName.dispose();
     _controllerEmail.dispose();
+    _controllerContact.dispose();
+    _controllerDesignation.dispose();
     _controllerPassword.dispose();
     _controllerConfirmPassword.dispose();
     super.dispose();
@@ -131,52 +139,58 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Widget _entryField(String title, TextEditingController controller, String placeholder) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: title,
-        labelStyle: const TextStyle(color: Colors.white),
-        hintText: placeholder,
-        hintStyle: const TextStyle(color: Colors.white70),
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.2),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide.none,
+    return SizedBox(
+      height: 45,
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: title,
+          labelStyle: const TextStyle(color: Colors.white),
+          hintText: placeholder,
+          hintStyle: const TextStyle(color: Colors.white70),
+          filled: true,
+          fillColor: Colors.white.withOpacity(0.2),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide.none,
+          ),
         ),
+        style: const TextStyle(color: Colors.white),
       ),
-      style: const TextStyle(color: Colors.white),
     );
   }
 
   Widget _passwordField(String title, TextEditingController controller, String placeholder) {
-    return TextField(
-      controller: controller,
-      obscureText: hidePassword,
-      decoration: InputDecoration(
-        labelText: title,
-        labelStyle: const TextStyle(color: Colors.white),
-        hintText: placeholder,
-        hintStyle: const TextStyle(color: Colors.white70),
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.2),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide.none,
-        ),
-        suffixIcon: IconButton(
-          onPressed: () {
-            setState(() {
-              hidePassword = !hidePassword;
-            });
-          }, 
-          icon: Icon(
-            hidePassword ? Icons.visibility_off : Icons.visibility,
-            color: Colors.white,
+    return SizedBox(
+      height: 45,
+      child: TextField(
+        controller: controller,
+        obscureText: hidePassword,
+        decoration: InputDecoration(
+          labelText: title,
+          labelStyle: const TextStyle(color: Colors.white),
+          hintText: placeholder,
+          hintStyle: const TextStyle(color: Colors.white70),
+          filled: true,
+          fillColor: Colors.white.withOpacity(0.2),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide.none,
+          ),
+          suffixIcon: IconButton(
+            onPressed: () {
+              setState(() {
+                hidePassword = !hidePassword;
+              });
+            }, 
+            icon: Icon(
+              hidePassword ? Icons.visibility_off : Icons.visibility,
+              color: Colors.white,
+            )
           )
-        )
+        ),
+        style: const TextStyle(color: Colors.white),
       ),
-      style: const TextStyle(color: Colors.white),
     );
   }
 
@@ -244,19 +258,23 @@ class _SignupScreenState extends State<SignupScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 _title(),
-                const SizedBox(height: 40),
+                const SizedBox(height: 20),
                 _entryField('Name', _controllerName, 'Enter Name'),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
                 _entryField('Email', _controllerEmail, 'Enter your Email'),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
+                _entryField('Contact#', _controllerContact, 'Enter your Contact'),
+                const SizedBox(height: 20),
+                _entryField('Designation', _controllerDesignation, 'Please enter your Designation'),
+                const SizedBox(height: 20),
                 _passwordField('Password', _controllerPassword, 'Enter Password'),
-                const SizedBox(height: 30),
-                _passwordField('Confirm Password', _controllerConfirmPassword, 'Confirm Password'),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
+                _passwordField('Confirm Password', _controllerConfirmPassword, 'Please confirm Password'),
+                const SizedBox(height: 4),
                 _errorMessage(),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 _signUpButton(),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 _logInButton(),
               ],
             ),
